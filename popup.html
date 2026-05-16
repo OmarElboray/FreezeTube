@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>YouTube Feed Freezer</title>
+  <style>
+    /* ── Reset & base ─────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg-0:      #0f0f0f;
+      --bg-1:      #1a1a1a;
+      --bg-2:      #242424;
+      --bg-3:      #2e2e2e;
+      --border:    #3a3a3a;
+      --text-1:    #f1f1f1;
+      --text-2:    #aaaaaa;
+      --text-3:    #666666;
+      --accent:    #3ea6ff;
+      --accent-2:  #1a8cff;
+      --red:       #ff4444;
+      --pro:       #ffd700;
+      --pro-dim:   #b89800;
+      --radius:    10px;
+      --font:      "Roboto", "Segoe UI", Arial, sans-serif;
+    }
+
+    body {
+      width: 320px;
+      background: var(--bg-0);
+      color: var(--text-1);
+      font-family: var(--font);
+      font-size: 13px;
+      line-height: 1.5;
+      overflow: hidden;
+    }
+
+    /* ── Header ───────────────────────────────────── */
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 16px 12px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg-1);
+    }
+
+    .header-icon {
+      font-size: 22px;
+      line-height: 1;
+      filter: drop-shadow(0 0 6px rgba(62,166,255,.5));
+    }
+
+    .header-text h1 {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-1);
+      letter-spacing: -.01em;
+    }
+
+    .header-text p {
+      font-size: 11px;
+      color: var(--text-3);
+      margin-top: 1px;
+    }
+
+    .status-badge {
+      margin-left: auto;
+      font-size: 10px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 20px;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+    }
+
+    .status-badge.active {
+      background: rgba(62,166,255,.15);
+      color: var(--accent);
+      border: 1px solid rgba(62,166,255,.3);
+    }
+
+    .status-badge.inactive {
+      background: rgba(255,68,68,.1);
+      color: var(--red);
+      border: 1px solid rgba(255,68,68,.25);
+    }
+
+    /* ── Sections ─────────────────────────────────── */
+    .section {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .section-label {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--text-3);
+      margin-bottom: 10px;
+    }
+
+    /* ── Toggle row ───────────────────────────────── */
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 0;
+    }
+
+    .toggle-row + .toggle-row {
+      border-top: 1px solid var(--bg-3);
+    }
+
+    .toggle-info { flex: 1; }
+    .toggle-info .label {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-1);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .toggle-info .sublabel {
+      font-size: 11px;
+      color: var(--text-3);
+      margin-top: 2px;
+    }
+
+    .pro-tag {
+      font-size: 9px;
+      font-weight: 700;
+      padding: 1px 5px;
+      border-radius: 4px;
+      background: linear-gradient(135deg, var(--pro), var(--pro-dim));
+      color: #000;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+    }
+
+    /* ── Toggle switch ────────────────────────────── */
+    .toggle {
+      position: relative;
+      width: 40px;
+      height: 22px;
+      flex-shrink: 0;
+    }
+
+    .toggle input { display: none; }
+
+    .toggle-track {
+      position: absolute;
+      inset: 0;
+      border-radius: 11px;
+      background: var(--bg-3);
+      border: 1px solid var(--border);
+      cursor: pointer;
+      transition: background .2s, border-color .2s;
+    }
+
+    .toggle-thumb {
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--text-3);
+      transition: transform .2s, background .2s;
+      pointer-events: none;
+    }
+
+    .toggle input:checked ~ .toggle-track {
+      background: rgba(62,166,255,.25);
+      border-color: var(--accent);
+    }
+
+    .toggle input:checked ~ .toggle-track .toggle-thumb {
+      transform: translateX(18px);
+      background: var(--accent);
+    }
+
+    .toggle.pro-toggle input:checked ~ .toggle-track {
+      background: rgba(255,215,0,.2);
+      border-color: var(--pro);
+    }
+
+    .toggle.pro-toggle input:checked ~ .toggle-track .toggle-thumb {
+      background: var(--pro);
+    }
+
+    .toggle input:disabled ~ .toggle-track {
+      opacity: .4;
+      cursor: not-allowed;
+    }
+
+    /* ── Snapshot indicator ───────────────────────── */
+    .snapshot-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 12px;
+      border-radius: var(--radius);
+      background: var(--bg-2);
+      border: 1px solid var(--border);
+      font-size: 12px;
+      color: var(--text-2);
+    }
+
+    .snapshot-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .snapshot-dot.active { background: #4caf50; box-shadow: 0 0 6px #4caf5088; }
+    .snapshot-dot.inactive { background: var(--text-3); }
+
+    .snapshot-info strong { color: var(--text-1); }
+
+    /* ── Action buttons ───────────────────────────── */
+    .actions {
+      display: flex;
+      gap: 8px;
+      padding: 14px 16px;
+    }
+
+    .btn {
+      flex: 1;
+      height: 34px;
+      border-radius: 6px;
+      border: none;
+      font-size: 12px;
+      font-weight: 600;
+      font-family: var(--font);
+      cursor: pointer;
+      transition: opacity .15s, transform .1s;
+      letter-spacing: .02em;
+    }
+
+    .btn:hover { opacity: .85; }
+    .btn:active { transform: scale(.97); }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #000;
+    }
+
+    .btn-secondary {
+      background: var(--bg-3);
+      color: var(--text-2);
+      border: 1px solid var(--border);
+    }
+
+    .btn-danger {
+      background: rgba(255,68,68,.12);
+      color: var(--red);
+      border: 1px solid rgba(255,68,68,.25);
+    }
+
+    /* ── Pro panel ────────────────────────────────── */
+    .pro-panel {
+      margin: 0 16px 14px;
+      padding: 12px 14px;
+      border-radius: var(--radius);
+      background: linear-gradient(135deg, rgba(255,215,0,.06), rgba(255,215,0,.02));
+      border: 1px solid rgba(255,215,0,.2);
+    }
+
+    .pro-panel h3 {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--pro);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 6px;
+    }
+
+    .pro-panel p {
+      font-size: 11px;
+      color: var(--text-2);
+      line-height: 1.55;
+    }
+
+    .btn-upgrade {
+      display: block;
+      width: 100%;
+      margin-top: 10px;
+      height: 30px;
+      border-radius: 6px;
+      border: none;
+      font-size: 12px;
+      font-weight: 700;
+      font-family: var(--font);
+      cursor: pointer;
+      background: linear-gradient(135deg, var(--pro), var(--pro-dim));
+      color: #000;
+      letter-spacing: .03em;
+      transition: opacity .15s;
+    }
+
+    .btn-upgrade:hover { opacity: .85; }
+
+    /* ── Footer ───────────────────────────────────── */
+    .footer {
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid var(--border);
+      background: var(--bg-1);
+    }
+
+    .footer span {
+      font-size: 10px;
+      color: var(--text-3);
+    }
+
+    .footer a {
+      font-size: 10px;
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    /* ── Toast ────────────────────────────────────── */
+    #toast {
+      position: fixed;
+      bottom: 12px;
+      left: 50%;
+      transform: translateX(-50%) translateY(10px);
+      background: var(--bg-3);
+      border: 1px solid var(--border);
+      color: var(--text-1);
+      font-size: 12px;
+      padding: 7px 14px;
+      border-radius: 20px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .2s, transform .2s;
+      white-space: nowrap;
+      z-index: 999;
+    }
+
+    #toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── Header ──────────────────────────────────────────── -->
+  <div class="header">
+    <span class="header-icon">❄</span>
+    <div class="header-text">
+      <h1>Feed Freezer</h1>
+      <p>Keep your YouTube feed stable</p>
+    </div>
+    <span class="status-badge active" id="statusBadge">Active</span>
+  </div>
+
+  <!-- ── Snapshot status ─────────────────────────────────── -->
+  <div class="section">
+    <div class="section-label">Feed Snapshot</div>
+    <div class="snapshot-info">
+      <div class="snapshot-dot inactive" id="snapDot"></div>
+      <div>
+        <strong id="snapLabel">No snapshot saved</strong>
+        <div id="snapSub" style="font-size:11px;margin-top:2px;color:var(--text-3)">
+          Visit YouTube's home page to capture a feed
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Core settings ───────────────────────────────────── -->
+  <div class="section">
+    <div class="section-label">Settings</div>
+
+    <div class="toggle-row">
+      <div class="toggle-info">
+        <div class="label">Freeze Home Feed</div>
+        <div class="sublabel">Prevent YouTube from refreshing on back-navigation</div>
+      </div>
+      <label class="toggle">
+        <input type="checkbox" id="toggleFreeze" />
+        <div class="toggle-track"><div class="toggle-thumb"></div></div>
+      </label>
+    </div>
+
+    <div class="toggle-row">
+      <div class="toggle-info">
+        <div class="label">
+          Snapshot Persistence
+          <span class="pro-tag">PRO</span>
+        </div>
+        <div class="sublabel">Save feed across browser restarts</div>
+      </div>
+      <label class="toggle pro-toggle">
+        <input type="checkbox" id="togglePersist" disabled />
+        <div class="toggle-track"><div class="toggle-thumb"></div></div>
+      </label>
+    </div>
+  </div>
+
+  <!-- ── Pro panel (shown when NOT pro) ─────────────────── -->
+  <div class="pro-panel" id="proPanelFree">
+    <h3>⚡ Feed Freezer Pro</h3>
+    <p>Save your frozen feed across browser restarts. Never lose your perfect feed snapshot again — even after a reboot.</p>
+    <button class="btn-upgrade" id="btnUpgrade">Upgrade to Pro — $2.99/mo</button>
+  </div>
+
+  <!-- ── Pro settings (shown when IS pro) ─────────────────── -->
+  <div class="section" id="proSectionPaid" style="display:none;">
+    <div class="section-label">Pro Settings ✦</div>
+    <div class="toggle-row">
+      <div class="toggle-info">
+        <div class="label">
+          Pro Mode Active
+          <span class="pro-tag">PRO</span>
+        </div>
+        <div class="sublabel">All pro features unlocked</div>
+      </div>
+      <label class="toggle pro-toggle">
+        <input type="checkbox" id="togglePro" />
+        <div class="toggle-track"><div class="toggle-thumb"></div></div>
+      </label>
+    </div>
+  </div>
+
+  <!-- ── Actions ─────────────────────────────────────────── -->
+  <div class="actions">
+    <button class="btn btn-secondary" id="btnGoHome">Go Home</button>
+    <button class="btn btn-danger"    id="btnClear">Clear Snapshot</button>
+    <button class="btn btn-primary"   id="btnRefresh">Refresh Feed</button>
+  </div>
+
+  <!-- ── Footer ──────────────────────────────────────────── -->
+  <div class="footer">
+    <span>Feed Freezer v1.0</span>
+    <a href="#" id="linkFeedback">Feedback</a>
+  </div>
+
+  <div id="toast"></div>
+
+  <!-- ── Script ────────────────────────────────────────────── -->
+  <script src="popup.js"></script>
+</body>
+</html>
