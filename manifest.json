@@ -1,27 +1,10 @@
 {
   "manifest_version": 3,
-  "name": "YouTube Feed Freezer",
+  "name": "Freeze Tube - Distraction Free YouTube™",
   "version": "1.0",
-  "description": "Freeze your YouTube home feed.",
-  "permissions": [
-    "storage",
-    "activeTab",
-    "scripting"
-  ],
-  "host_permissions": [
-    "*://*.youtube.com/*"
-  ],
-  "background": {
-    "service_worker": "background.js"
-  },
-  "content_scripts": [
-    {
-      "matches": ["*://*.youtube.com/*"],
-      "js": ["content.js"],
-      "run_at": "document_end"
-    }
-  ],
-  "action": {
+  "description": "Stop the infinite scroll. Block your feed, hide recommendations, and reclaim your focus with this clean, lightweight extension.",
+  
+    "action": {
     "default_popup": "popup.html",
     "default_icon": {
       "16": "icons/icon16.png",
@@ -33,5 +16,14 @@
     "16": "icons/icon16.png",
     "48": "icons/icon48.png",
     "128": "icons/icon128.png"
-  }
+  },
+  "content_scripts": [
+    {
+      "matches": ["*://*.youtube.com/*"],
+      "js": ["content.js"]
+    }
+  ],
+  "permissions": [
+    "storage"
+  ]
 }
