@@ -1,10 +1,17 @@
 {
   "manifest_version": 3,
-  "name": "Freeze Tube - Distraction Free YouTube™",
-  "version": "1.0",
-  "description": "Stop the infinite scroll. Block your feed, hide recommendations, and reclaim your focus with this clean, lightweight extension.",
-  
-    "action": {
+  "name": "FreezeTube – Stop YouTube Algorithm & Homepage Feed",
+  "version": "4.0.1",
+  "description": "Take back your time. FreezeTube locks your YouTube homepage so the algorithm can never pull you back in.",
+  "permissions": [
+    "storage",
+    "scripting",
+    "tabs"
+  ],
+  "host_permissions": [
+    "*://*.youtube.com/*"
+  ],
+  "action": {
     "default_popup": "popup.html",
     "default_icon": {
       "16": "icons/icon16.png",
@@ -20,10 +27,15 @@
   "content_scripts": [
     {
       "matches": ["*://*.youtube.com/*"],
-      "js": ["content.js"]
+      "js": ["js/content_bridge.js"],
+      "run_at": "document_start",
+      "world": "ISOLATED"
+    },
+    {
+      "matches": ["*://*.youtube.com/*"],
+      "js": ["js/seed.js"],
+      "run_at": "document_start",
+      "world": "MAIN"
     }
-  ],
-  "permissions": [
-    "storage"
   ]
 }

@@ -1,198 +1,138 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Freeze Tube</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;800&display=swap" rel="stylesheet">
-    <style>
-        /* --- Brand Variables --- */
-        :root {
-            --bg-pure: #ffffff;
-            --bg-subtle: #f8f9fa;
-            --text-dark: #121212;
-            --text-grey: #5f6368;
-            --text-light: #9aa0a6;
-            --accent-cyan: #00e5ff;
-            --accent-cyan-hover: #00c4db;
-            --accent-red: #ff4d4d;
-        }
+  <meta charset="UTF-8">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800;900&display=swap');
+    body { font-family: 'Montserrat', sans-serif; width: 340px; margin: 0; padding: 0; background: #FFFFFF; color: #111111; }
+    .header { display: flex; align-items: center; justify-content: center; gap: 12px; padding: 20px 0 12px 0; border-bottom: 2px solid #F0F0F0; }
+    .header-icon { background: #00DCFF; color: white; width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 14px; box-shadow: 0 4px 10px rgba(0, 220, 255, 0.4); }
+    .header h2 { margin: 0; font-size: 20px; font-weight: 900; letter-spacing: -0.5px; }
+    
+    .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 16px; background: #FAFAFA; border-bottom: 2px solid #F0F0F0; }
+    .stat-box { text-align: center; }
+    .stat-val { font-size: 18px; font-weight: 900; color: #00DCFF; }
+    .stat-label { font-size: 9px; font-weight: 800; color: #888; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; }
+    
+    /* --- NEW PRESET DESIGN --- */
+    .presets { display: flex; gap: 10px; padding: 16px 16px 0; }
+    .preset-btn { 
+        flex: 1; 
+        background: #FFFFFF; 
+        border: 2px solid #EEEEEE; 
+        padding: 10px 4px; 
+        border-radius: 10px; 
+        font-size: 10px; 
+        font-weight: 800; 
+        color: #777;
+        cursor: pointer; 
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); 
+        text-transform: uppercase;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 6px;
+    }
+    .preset-icon { font-size: 18px; }
+    .preset-btn:hover { 
+        border-color: #00DCFF; 
+        color: #111; 
+        background: #F4FDFF; 
+        transform: translateY(-3px);
+        box-shadow: 0 6px 14px rgba(0, 220, 255, 0.15);
+    }
+    .preset-btn:active { transform: translateY(0); box-shadow: none; }
+    /* ------------------------- */
 
-        /* --- Global Reset --- */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            width: 320px; /* Standard extension popup width */
-            font-family: 'Montserrat', sans-serif;
-            background-color: var(--bg-pure);
-            color: var(--text-dark);
-            -webkit-font-smoothing: antialiased;
-            display: flex;
-            flex-direction: column;
-            min-height: 250px;
-        }
-
-        /* --- Header --- */
-        header {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            padding: 20px;
-            border-bottom: 1px solid #eaeaea;
-            background-color: var(--bg-subtle);
-        }
-
-        .ft-logo-placeholder {
-            width: 28px;
-            height: 28px;
-            background-color: var(--accent-cyan);
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--text-dark);
-            font-size: 0.5rem;
-            font-weight: 800;
-        }
-
-        h1 {
-            font-size: 1.2rem;
-            font-weight: 800;
-            letter-spacing: -0.5px;
-        }
-
-        /* --- Main Controls --- */
-        main {
-            padding: 30px 20px;
-            text-align: center;
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            gap: 15px;
-        }
-
-        .status-text {
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: var(--text-grey);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        /* The main toggle button used in your popup.js */
-        #toggleBtn {
-            width: 100%;
-            background-color: var(--accent-cyan);
-            color: var(--text-dark);
-            border: none;
-            padding: 16px;
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 800;
-            font-size: 1.1rem;
-            border-radius: 8px;
-            cursor: pointer;
-            text-transform: uppercase;
-            transition: all 0.2s ease;
-            box-shadow: 0 4px 15px rgba(0, 229, 255, 0.25);
-        }
-
-        #toggleBtn:hover {
-            background-color: var(--accent-cyan-hover);
-            transform: translateY(-1px);
-            box-shadow: 0 6px 20px rgba(0, 229, 255, 0.35);
-        }
-
-        #toggleBtn:active {
-            transform: translateY(1px);
-            box-shadow: 0 2px 10px rgba(0, 229, 255, 0.2);
-        }
-
-        /* State when feed is frozen (toggled via JS) */
-        #toggleBtn.frozen {
-            background-color: var(--bg-subtle);
-            color: var(--accent-red);
-            border: 2px solid var(--accent-red);
-            box-shadow: none;
-        }
-
-        #toggleBtn.frozen:hover {
-            background-color: #fff0f0;
-        }
-
-        /* --- Footer (TD Branding) --- */
-        footer {
-            padding: 15px;
-            border-top: 1px solid #eaeaea;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            background-color: var(--bg-pure);
-        }
-
-        .footer-text {
-            font-size: 0.7rem;
-            font-weight: 600;
-            color: var(--text-light);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .td-brand {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            color: var(--text-dark);
-            font-weight: 700;
-            font-size: 0.8rem;
-            text-decoration: none;
-        }
-
-        .td-logo-placeholder {
-            width: 18px;
-            height: 18px;
-            background-color: var(--text-dark);
-            border-radius: 3px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--bg-pure);
-            font-size: 0.4rem;
-            font-weight: 800;
-        }
-    </style>
+    .content { padding: 16px; }
+    .row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; cursor: pointer; }
+    .row-text { font-size: 13px; font-weight: 700; color: #111111; }
+    
+    .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #E5E5E5; transition: .3s; border-radius: 34px; }
+    .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 4px; bottom: 4px; background-color: white; transition: .3s; border-radius: 50%; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+    input:checked + .slider { background-color: #00DCFF; }
+    input:checked + .slider:before { transform: translateX(20px); }
+    
+    .select-row { display: flex; align-items: center; justify-content: space-between; background: #F9F9F9; padding: 10px 14px; border-radius: 8px; border: 1px solid #EEEEEE; margin: 10px 0; }
+    .select-text { font-size: 12px; font-weight: 800; color: #666; }
+    select { background: white; border: 2px solid #E5E5E5; padding: 4px 8px; border-radius: 6px; font-family: inherit; font-weight: 800; font-size: 12px; cursor: pointer; outline: none; }
+    
+    .refresh-btn { width: 100%; background: #111; color: white; border: none; padding: 14px; border-radius: 8px; font-family: inherit; font-weight: 800; font-size: 13px; cursor: pointer; margin-top: 10px; text-transform: uppercase; letter-spacing: 0.5px;}
+    .refresh-btn:hover { background: #00DCFF; color: #111; }
+  </style>
 </head>
 <body>
+  <div class="header">
+    <div class="header-icon">II</div>
+    <h2>FreezeTube</h2>
+  </div>
 
-    <header>
-        <!-- Replace with your Freeze Tube Logo -->
-       <img src="icons/icon48.png" alt="Freeze Tube Logo" style="width: 28px; height: 28px; border-radius: 6px;">
+  <div class="stats-grid">
+    <div class="stat-box">
+      <div class="stat-val" id="stat-blocked">0</div>
+      <div class="stat-label">Vids Blocked</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-val" id="stat-hidden">0</div>
+      <div class="stat-label">Sidebars Hid</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-val" id="stat-time">0h</div>
+      <div class="stat-label">Time Saved</div>
+    </div>
+  </div>
 
-        <h1>Freeze Tube</h1>
-    </header>
+  <div class="presets">
+    <button class="preset-btn" id="pre-study">
+      <span class="preset-icon">📚</span>
+      <span>Study</span>
+    </button>
+    <button class="preset-btn" id="pre-research">
+      <span class="preset-icon">🔍</span>
+      <span>Research</span>
+    </button>
+    <button class="preset-btn" id="pre-deep">
+      <span class="preset-icon">⚡</span>
+      <span>Deep Work</span>
+    </button>
+  </div>
+  
+  <div class="content">
+    <div id="row-freezeFeed" class="row">
+      <span class="row-text">FREEZE FEED</span>
+      <label class="switch"><input type="checkbox" id="freezeFeed" class="toggle"><span class="slider"></span></label>
+    </div>
+    
+    <div class="select-row">
+      <span class="select-text">MAX VIDEOS</span>
+      <select id="maxVideos">
+        <option value="6">6 Videos</option>
+        <option value="12">12 Videos</option>
+        <option value="18">18 Videos</option>
+        <option value="0">Zero (Full Block)</option>
+      </select>
+    </div>
 
-    <main>
-        <div class="status-text" id="statusText">Algorithm Active</div>
-        <!-- This ID matches your popup.js -->
-        <button id="toggleBtn">Freeze Feed</button>
-    </main>
+    <div id="row-hideRecommendations" class="row">
+      <span class="row-text">Hide Side Bar</span>
+      <label class="switch"><input type="checkbox" id="hideRecommendations" class="toggle"><span class="slider"></span></label>
+    </div>
 
-    <footer>
-        <span class="footer-text">Built by</span>
-        <a href="#" class="td-brand">
-            <!-- Replace with your Tiny Developments Logo -->
-          <img src="icons/td-logo.png" alt="Tiny Developments" style="width: 18px; height: 18px; border-radius: 3px;">
+    <div id="row-blockShorts" class="row">
+      <span class="row-text">Block Shorts</span>
+      <label class="switch"><input type="checkbox" id="blockShorts" class="toggle"><span class="slider"></span></label>
+    </div>
+    
+    <div id="row-hideEndScreen" class="row">
+      <span class="row-text">Hide End Cards</span>
+      <label class="switch"><input type="checkbox" id="hideEndScreen" class="toggle"><span class="slider"></span></label>
+    </div>
 
-            Tiny Developments
-        </a>
-    </footer>
+    <button id="forceRefreshBtn" class="refresh-btn">🔄 Get New Batch</button>
+  </div>
 
-    <script src="popup.js"></script>
+  <script src="popup.js"></script>
 </body>
 </html>
