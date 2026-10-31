@@ -1,130 +1,64 @@
 # FreezeTube
 
-FreezeTube is a browser extension that removes YouTube’s recommendation loops and infinite scrolling while keeping search and video playback fully functional.
+**A Chrome extension that keeps YouTube from pulling you away from what you came to watch.**
 
-It turns YouTube into a controlled tool instead of a feed designed for continuous browsing.
+<!-- Add a screenshot or GIF here: ![FreezeTube demo](docs/demo.gif) -->
+<!-- Add your Chrome Web Store link here: [Install from the Chrome Web Store](YOUR_LINK) -->
 
----
+YouTube is built to maximize watch time. FreezeTube removes the parts that do that, and keeps search, subscriptions, and playback working as normal. You use YouTube when you decide what to watch, not what the algorithm pushes next.
+
+## Why I built it
+
+Most productivity tools block YouTube entirely. That doesn't work when you need it for lectures, tutorials, or research. FreezeTube keeps access and removes the distraction.
 
 ## What it does
 
-YouTube is built to maximize watch time through recommendations and endless scroll.
-
-FreezeTube changes that behavior:
-
 - Stops infinite scroll on the homepage
-- Limits the number of recommended videos loaded
+- Limits how many recommended videos load
 - Hides sidebar recommendations during playback
-- Optional hiding of Shorts, comments, and related feeds
-- Keeps search, subscriptions, and playback unchanged
+- Optionally hides Shorts and comments
+- No login, no tracking, no external servers. Everything runs locally in your browser.
 
-You use YouTube when you decide what to watch, not what the algorithm pushes next.
+## Results
 
----
+19,000+ Chrome Web Store impressions in five months with no advertising, and users in 56+ countries.
 
-## Why it exists
+## How it works
 
-Most productivity tools block YouTube completely.
+A content script watches DOM changes on YouTube pages and blocks new feed inserts. A background service worker handles extension state, and settings are saved in local browser storage. Built with vanilla JavaScript and Chrome Manifest V3.
 
-That creates friction when you need YouTube for:
+## Install (developer mode)
 
-- Tutorials
-- Lectures
-- Coding walkthroughs
-- Research
+```bash
+git clone https://github.com/OmarElboray/FreezeTube.git
+```
 
-FreezeTube keeps access but removes the parts that waste time.
-
----
-
-## Features
-
-- Infinite scroll blocking on homepage feed
-- Recommendation cap control
-- Optional UI cleanup
-  - Sidebar recommendations
-  - Shorts tab
-  - Comments section
-- Lightweight content script
-- No login required
-- No tracking
-- Runs locally in browser
-
----
-
-## Tech stack
-
-- Vanilla JavaScript
-- Chrome Manifest V3
-- Content scripts for DOM control
-- Background service worker for state handling
-- Local storage for settings
-
----
+1. Open `chrome://extensions` and turn on **Developer mode**.
+2. Click **Load unpacked** and select the `FreezeTube` folder.
+3. Open YouTube and refresh the page.
 
 ## Project structure
 
-```text
+```
 FreezeTube/
-├── manifest.json        Extension configuration
-├── content.js           Main DOM controller for YouTube pages
-├── background.js        Service worker for extension lifecycle
-├── popup.html           Settings interface
-├── popup.js             Settings logic and UI behavior
-├── content_bridge.js    Safe bridge between scripts
-├── seed.js              Default configuration presets
-└── styles.css           Optional UI styling
+├── manifest.json    Extension configuration
+├── content.js       DOM controller for YouTube pages
+├── background.js    Service worker
+├── popup.html       Settings interface
+├── popup.js         Settings logic
+├── js/              Shared scripts
+└── icons/           Extension icons
+```
 
-Installation (developer mode)
-Download or clone the repository
-git clone https://github.com/your-username/freezetube.git
-cd freezetube
-Open Chrome extensions page
-Go to chrome://extensions
-Enable Developer Mode
-Load the extension
-Click Load unpacked
-Select the FreezeTube folder
-Test it
-Open YouTube
-Refresh the page
-Feed should stop behaving normally
-How it works
+*Adjust this list so it matches your actual files.*
 
-FreezeTube runs a content script on YouTube pages.
+## Roadmap
 
-It:
+- Time-based locking presets
+- Per-channel whitelist
+- Focus-session timer
+- Firefox support
 
-Observes DOM changes
-Blocks new feed inserts
-Removes recommendation containers
-Limits render cycles for homepage grid
-Overrides infinite scroll triggers
+## License
 
-It does not modify YouTube servers.
-
-Everything happens locally in your browser.
-
-Privacy
-No data collection
-No external servers
-No analytics
-No tracking scripts
-
-Everything stays on-device.
-
-Roadmap
-Custom study modes
-Time-based locking presets
-Usage analytics (local only)
-Per-channel whitelist
-Focus sessions timer integration
-Firefox support
-Use cases
-Studying with YouTube lectures
-Coding tutorials without distraction loops
-Research sessions
-Controlled entertainment browsing
-License
-
-MIT License
+MIT
